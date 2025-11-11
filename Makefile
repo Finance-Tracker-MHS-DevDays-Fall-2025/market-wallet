@@ -1,5 +1,6 @@
 all: market wallet
 
+
 market:
 	go build -o market_server market-wallet/cmd/market
 
