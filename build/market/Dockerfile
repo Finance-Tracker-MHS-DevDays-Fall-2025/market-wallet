@@ -10,7 +10,7 @@ RUN go mod download
 COPY cmd/market ./cmd
 COPY internal ./internal
 
-RUN go build -o ./bin/main ./cmd
+RUN GOOS=linux GOARCH=amd64 go build -o ./bin/main ./cmd
 
 FROM alpine:latest AS app
 
