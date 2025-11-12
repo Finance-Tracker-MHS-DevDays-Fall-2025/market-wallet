@@ -1,19 +1,19 @@
 package main
 
 import (
-    "context"
-    "log"
-    "net"
+	"context"
+	"log"
+	"net"
 
-    "google.golang.org/grpc"
-    pb "market-wallet/internal/generated/api-market"
-    cm "market-wallet/internal/generated/api-common"
+	"google.golang.org/grpc"
+	cm "market-wallet/internal/generated/api-common"
+	pb "market-wallet/internal/generated/api-market"
 
-    // for created_at
-    "google.golang.org/protobuf/types/known/timestamppb"
-    "time"
+	// for created_at
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"time"
 
-    market "market-wallet/internal/market"
+	market "market-wallet/internal/market"
 )
 
 /*
@@ -27,103 +27,103 @@ type MarketServiceServer interface {
 */
 
 type server struct {
-    pb.UnimplementedMarketServiceServer
+	pb.UnimplementedMarketServiceServer
 }
 
 // Мок для получения инфы о количестве бумаг у конкретного пользователя
 // in (user_id, backend, account_id)
 func (s *server) GetInvestmentPositions(c context.Context, req *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
-    return market.GetInvestmentPositions(c, req)
-/*
-    log.Printf("Received: GetInvestmentPositions")
-    positions := []*pb.InvestmentPosition{
-        &pb.InvestmentPosition {
-            Figi: "figi1",
-            Quantity: 15,
-            Price: &cm.Money {
-                Amount: 100000, // копеек
-                Currency: "RUR",
-            },
-        },
-        &pb.InvestmentPosition{
-            Figi: "figi2",
-            Quantity: 1,
-            Price: &cm.Money {
-                Amount: 130000, // копеек
-                Currency: "RUR", 
-            },
-        },
-    }
-    ret := &pb.GetInvestmentPositionsResponse{Positions: positions};
-    return ret, nil
-*/
+	return market.GetInvestmentPositions(c, req)
+	/*
+	   log.Printf("Received: GetInvestmentPositions")
+
+	   	positions := []*pb.InvestmentPosition{
+	   	    &pb.InvestmentPosition {
+	   	        Figi: "figi1",
+	   	        Quantity: 15,
+	   	        Price: &cm.Money {
+	   	            Amount: 100000, // копеек
+	   	            Currency: "RUR",
+	   	        },
+	   	    },
+	   	    &pb.InvestmentPosition{
+	   	        Figi: "figi2",
+	   	        Quantity: 1,
+	   	        Price: &cm.Money {
+	   	            Amount: 130000, // копеек
+	   	            Currency: "RUR",
+	   	        },
+	   	    },
+	   	}
+
+	   ret := &pb.GetInvestmentPositionsResponse{Positions: positions};
+	   return ret, nil
+	*/
 }
 
 // Мок для получения информации о бумаге/облигации
 // in figi
 // out (id, figi, pretty_name, current_price, price_updated_at)
 func (s *server) GetSecurity(c context.Context, req *pb.GetSecurityRequest) (*pb.GetSecurityResponse, error) {
-    infos, err := market.GetInstrumentsInfo(c, []string{req.GetFigi()});
-    if err != nil {
-        return nil, err
-    }
-    return &pb.GetSecurityResponse{Security: infos[0]}, nil
+	infos, err := market.GetInstrumentsInfo(c, []string{req.GetFigi()})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetSecurityResponse{Security: infos[0]}, nil
 }
-
 
 // Мок для получения информации о бумаге/облигации (теперь получаем массив
 // in [figi]+
 // out [(id, figi, pretty_name, current_price, price_updated_at)]+
 func (s *server) GetSecuritiesPrices(c context.Context, req *pb.GetSecuritiesPricesRequest) (*pb.GetSecuritiesPricesResponse, error) {
-    infos, err := market.GetInstrumentsInfo(c, req.GetFigis());
-    if err != nil {
-        return nil, err
-    }
-    return &pb.GetSecuritiesPricesResponse{Securities: infos}, nil
+	infos, err := market.GetInstrumentsInfo(c, req.GetFigis())
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetSecuritiesPricesResponse{Securities: infos}, nil
 }
-
 
 // Мок для получения выплат по бумагам
 // in [figi]+, start_date, stop_date
 // out [(figi,payment, payment_date), ...]+
 func (s *server) GetSecurityPayments(_ context.Context, req *pb.GetSecuritiesPaymentsRequest) (*pb.GetSecuritiesPaymentsResponse, error) {
-    log.Printf("Received: GetSecurityPayments")
-    figis := req.GetFigis() // []string
-    start_date := req.GetStartDate()
-    end_date := req.GetEndDate()
-    log.Printf("Received: GetSecurityPayments %v, %v, %v", figis, start_date, end_date)
+	log.Printf("Received: GetSecurityPayments")
+	figis := req.GetFigis() // []string
+	start_date := req.GetStartDate()
+	end_date := req.GetEndDate()
+	log.Printf("Received: GetSecurityPayments %v, %v, %v", figis, start_date, end_date)
 
-    ret := []*pb.SecurityPayment {
-        &pb.SecurityPayment{
-            Figi: "figi1",
-            Payment: &cm.Money {
-                Amount: 34500, // копеек
-                Currency: "RUR",
-            },
-            PaymentDate: timestamppb.New(time.Now()), // bruh
-        },
-        &pb.SecurityPayment{
-            Figi: "figi2",
-            Payment: &cm.Money {
-                Amount: 100, // копеек
-                Currency: "RUR",
-            },
-            PaymentDate: timestamppb.New(time.Now()), // bruh^2
-        },
-    }
+	ret := []*pb.SecurityPayment{
+		&pb.SecurityPayment{
+			Figi: "figi1",
+			Payment: &cm.Money{
+				Amount:   34500, // копеек
+				Currency: "RUR",
+			},
+			PaymentDate: timestamppb.New(time.Now()), // bruh
+		},
+		&pb.SecurityPayment{
+			Figi: "figi2",
+			Payment: &cm.Money{
+				Amount:   100, // копеек
+				Currency: "RUR",
+			},
+			PaymentDate: timestamppb.New(time.Now()), // bruh^2
+		},
+	}
 
-    return &pb.GetSecuritiesPaymentsResponse{Payments: ret}, nil
+	return &pb.GetSecuritiesPaymentsResponse{Payments: ret}, nil
 }
 
 func main() {
-    lis, err := net.Listen("tcp", ":8888")
-    if err != nil {
-        log.Fatalf("failed to listen: %v", err)
-    }
-    s := grpc.NewServer()
-    pb.RegisterMarketServiceServer(s, &server{})
-    log.Printf("Server listening at %v", lis.Addr())
-    if err := s.Serve(lis); err != nil {
-        log.Fatalf("failed to serve: %v", err)
-    }
+	lis, err := net.Listen("tcp", ":8888")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	pb.RegisterMarketServiceServer(s, &server{})
+	log.Printf("Server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
