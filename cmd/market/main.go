@@ -74,6 +74,38 @@ func (s *server) GetSecurity(_ context.Context, req *pb.GetSecurityRequest) (*pb
 }
 
 
+// Мок для получения информации о бумаге/облигации (теперь получаем массив
+// in [figi]+
+// out [(id, figi, pretty_name, current_price, price_updated_at)]+
+func (s *server) GetSecuritiesPrices( _ context.Context, req *pb.GetSecuritiesPricesRequest) (*pb.GetSecuritiesPricesResponse, error) {
+    figis := req.GetFigis() // []string
+    log.Printf("Received: GetSecuritiesPrices")
+    secs := []*pb.Security{
+        &pb.Security{
+            Id: "хз что тут должно быть",
+            Figi: figis[0],
+            Name: "Полное имя бумаги",
+            CurrentPrice: &cm.Money {
+                Amount: 90000, // копеек
+                Currency: "RUR",
+            },
+            PriceUpdatedAt: timestamppb.New(time.Now()),
+        },
+        &pb.Security{
+            Id: "хз что тут должно быть 2",
+            Figi: figis[1],
+            Name: "Полное имя бумаги 2",
+            CurrentPrice: &cm.Money {
+                Amount: 34500, // копеек
+                Currency: "RUR",
+            },
+            PriceUpdatedAt: timestamppb.New(time.Now()),
+        },
+    }
+    ret := &pb.GetSecuritiesPricesResponse{Securities: secs};
+    return ret, nil
+}
+
 func main() {
     lis, err := net.Listen("tcp", ":8888")
     if err != nil {
