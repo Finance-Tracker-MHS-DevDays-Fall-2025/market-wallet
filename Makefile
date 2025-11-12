@@ -12,6 +12,9 @@ api-gen:
 market: api-gen
 	go build -o market_server market-wallet/cmd/market
 
+market-client: api-gen
+	go build -o market-client_server market-wallet/cmd/client_market
+
 wallet: api-gen
 	go build -o wallet_server market-wallet/cmd/wallet
 
