@@ -20,3 +20,16 @@ wallet: api-gen
 
 clean:
 	rm -rf market_server wallet_server
+
+
+market-img:
+	docker build -f build/market/Dockerfile -t market .
+
+wallet-img:
+	docker build -f build/wallet/Dockerfile -t wallet .
+
+upload-img:
+	docker tag market:latest cr.yandex/crpkimlhn85fg9vjfj7l/market:latest
+	docker tag wallet:latest cr.yandex/crpkimlhn85fg9vjfj7l/wallet:latest
+	docker image push cr.yandex/crpkimlhn85fg9vjfj7l/market:latest
+	docker image push cr.yandex/crpkimlhn85fg9vjfj7l/wallet:latest
