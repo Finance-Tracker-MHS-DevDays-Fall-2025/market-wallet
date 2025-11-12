@@ -7,6 +7,7 @@ api-gen:
 	protoc --go-grpc_out=./internal/generated -I$(COMMON_REPO)/proto  $(COMMON_REPO)/proto/market/market.proto 
 	protoc --go_out=./internal/generated -I$(COMMON_REPO)/proto  $(COMMON_REPO)/proto/market/market.proto 
 	protoc --go-grpc_out=./internal/generated -I$(COMMON_REPO)/proto  $(COMMON_REPO)/proto/wallet/wallet.proto 
+	protoc --go_out=./internal/generated -I$(COMMON_REPO)/proto  $(COMMON_REPO)/proto/wallet/wallet.proto 
 
 market: api-gen
 	go build -o market_server market-wallet/cmd/market
