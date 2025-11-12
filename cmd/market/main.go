@@ -2,18 +2,11 @@ package main
 
 import (
 	"context"
-	"log"
-	"net"
-
 	"google.golang.org/grpc"
-	//cm "market-wallet/internal/generated/api-common"
+	"log"
 	pb "market-wallet/internal/generated/api-market"
-
-	// for created_at
-	//"google.golang.org/protobuf/types/known/timestamppb"
-	//"time"
-
 	market "market-wallet/internal/market"
+	"net"
 )
 
 type server struct {

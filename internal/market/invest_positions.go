@@ -6,13 +6,13 @@ import (
 	"fmt"
 
 	investapi "github.com/russianinvestments/invest-api-go-sdk/investgo"
-	pb "market-wallet/internal/generated/api-market"
+	cm "market-wallet/internal/generated/api-common"
+	m_pb "market-wallet/internal/generated/api-market"
 
 	"market-wallet/internal/utils"
-	//"github.com/russianinvestments/invest-api-go-sdk/retry"
 )
 
-func GetInvestmentPositions(ctx context.Context, req *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
+func GetInvestmentPositions(ctx context.Context, req *m_pb.GetInvestmentPositionsRequest) (*m_pb.GetInvestmentPositionsResponse, error) {
 	// Проверяем, что backend правильного типа
 	if req.Backend == nil || req.Backend.Type != "TInvest" {
 		return nil, errors.New("invalid backend type")
@@ -20,68 +20,57 @@ func GetInvestmentPositions(ctx context.Context, req *pb.GetInvestmentPositionsR
 
 	// Создаем клиент Tinkoff Invest API
 	cfg := utils.DefaultConfig(req.Backend.Token)
-	_, err := investapi.NewClient(ctx, cfg, utils.GetGlobalLogger())
+	client, err := investapi.NewClient(ctx, cfg, utils.GetGlobalLogger())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create invest client: %w", err)
 	}
 
-	return nil, nil
+	// Получаем сервис операций
+	operationsService := client.NewOperationsServiceClient()
 
-	/*
+	accountID := "123"
 
-	       // создаем клиента для сервиса операций
-	   	operationsService := client.NewOperationsServiceClient()
+	// Получаем позиции по счету
+	positionsResp, err := operationsService.GetPositions(accountID)
+	if err != nil {
+		return nil, err
+	}
 
-	   	portfolioResp, err := operationsService.GetPortfolio(cfg.AccountId, pb.PortfolioRequest_RUB)
-	   	if err != nil {
-	   		global_logger.Errorf(err.Error())
-	   	} else {
-	   		fmt.Printf("amount of shares = %v\n", portfolioResp.GetTotalAmountShares())
-	   	}
-	*/
+	// Получаем список позиций по ценным бумагам
+	securities := positionsResp.GetSecurities()
 
-	/*
+	// Создаем слайс для хранения информации о позициях
+	positions := make([]*m_pb.InvestmentPosition, 0, len(securities))
 
-		// Если account_id не указан, берем первый счет
-		accountID := req.AccountId
-		if accountID == "" {
-			accountID = accounts[0].Id
-		}
+	// Получаем сервис инструментов для получения дополнительной информации
+	instrumentsService := client.NewInstrumentsServiceClient()
 
-		// Получаем позиции по счету
-		positionsResp, err := retry.Retry(ctx, func() (*investapi.PositionsResponse, error) {
-			return client.Operations.GetPositions(ctx, accountID)
-		})
+	for _, security := range securities {
+		// Получаем информацию об инструменте по его uid
+		instrumentResp, err := instrumentsService.InstrumentByUid(security.GetInstrumentUid())
 		if err != nil {
-			return nil, fmt.Errorf("failed to get positions: %w", err)
+			return nil, err
 		}
 
-		// Конвертируем позиции в protobuf формат
-		var positions []*pb.InvestmentPosition
-		for _, security := range positionsResp.Securities {
-			// Находим текущую цену инструмента
-			lastPrice, err := client.MarketData.GetLastPrices(ctx, []string{security.Figi})
-			if err != nil {
-				return nil, fmt.Errorf("failed to get last price for figi %s: %w", security.Figi, err)
-			}
+		instrument := instrumentResp.GetInstrument()
 
-			if len(lastPrice) == 0 {
-				return nil, fmt.Errorf("no last price for figi %s", security.Figi)
-			}
-
-			positions = append(positions, &pb.InvestmentPosition{
-				Figi:     security.Figi,
-				Quantity: int32(security.Balance),
-				Price: &pb.Money{
-					Amount:   int64(lastPrice[0].Price * 100), // конвертируем в копейки
-					Currency: "RUR",
-				},
-			})
+		// Создаем позицию
+		position := &m_pb.InvestmentPosition{
+			Figi:     instrument.GetFigi(),
+			Quantity: int32(security.GetBalance()),
+			Price: &cm.Money{
+				Amount:   1,
+				Currency: "RUR",
+			},
 		}
 
-		return &pb.GetInvestmentPositionsResponse{
-			Positions: positions,
-		}, nil
+		positions = append(positions, position)
+	}
 
-	*/
+	// Формируем ответ
+	response := &m_pb.GetInvestmentPositionsResponse{
+		Positions: positions,
+	}
+
+	return response, nil
 }
