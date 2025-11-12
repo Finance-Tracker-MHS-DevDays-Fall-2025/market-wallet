@@ -28,7 +28,7 @@ market-img:
 wallet-img:
 	docker build -f build/wallet/Dockerfile -t wallet .
 
-upload-img:
+upload-img: market-img wallet-img
 	docker tag market:latest cr.yandex/crpkimlhn85fg9vjfj7l/market:latest
 	docker tag wallet:latest cr.yandex/crpkimlhn85fg9vjfj7l/wallet:latest
 	docker image push cr.yandex/crpkimlhn85fg9vjfj7l/market:latest

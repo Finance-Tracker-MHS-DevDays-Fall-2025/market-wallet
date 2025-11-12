@@ -13,6 +13,8 @@ import (
 
 	cm "market-wallet/internal/generated/api-common"
 	m_pb "market-wallet/internal/generated/api-market"
+
+	"market-wallet/internal/utils"
 )
 
 // instrumentInfo содержит информацию о финансовом инструменте
@@ -24,8 +26,8 @@ type instrumentInfo struct {
 }
 
 func GetInstrumentsInfo(ctx context.Context, figis []string) ([]*m_pb.Security, error) {
-	cfg := DefaultConfig("TOKEN")
-	client, err := investgo.NewClient(ctx, cfg, GetGlobalLogger())
+	cfg := utils.DefaultConfig("TOKEN")
+	client, err := investgo.NewClient(ctx, cfg, utils.GetGlobalLogger())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create invest client: %w", err)
 	}
@@ -97,9 +99,8 @@ func getInstrumentsInfoImpl(client *investgo.Client, figis []string) ([]instrume
 			}
 
 			// Сохраняем цену
-			lastPrice := lastPriceResp.GetLastPrices()[0]
-			pr := lastPrice.GetPrice()
-			info.Price = int64(pr.Units*10) + int64(pr.Nano/1e7)
+			//lastPrice := lastPriceResp.GetLastPrices()[0]
+			info.Price = 0 //TODO(nechda) fix it utils.ToRUR(lastPrice.GetPrice())
 
 			results[index] = info
 		}(i, figi)

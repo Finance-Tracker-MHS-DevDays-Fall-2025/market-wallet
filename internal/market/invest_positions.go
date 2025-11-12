@@ -4,48 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
-	"time"
 
 	investapi "github.com/russianinvestments/invest-api-go-sdk/investgo"
 	pb "market-wallet/internal/generated/api-market"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"market-wallet/internal/utils"
 	//"github.com/russianinvestments/invest-api-go-sdk/retry"
 )
-
-func GetDefaultLogger() investapi.Logger {
-	zapConfig := zap.NewDevelopmentConfig()
-	zapConfig.EncoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout(time.DateTime)
-	zapConfig.EncoderConfig.TimeKey = "time"
-	l, err := zapConfig.Build()
-	logger := l.Sugar()
-	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			log.Printf(err.Error())
-		}
-	}()
-	if err != nil {
-		log.Fatalf("logger creating error %v", err)
-		return nil
-	}
-	return logger
-}
-
-var global_logger = GetDefaultLogger()
-
-func GetGlobalLogger() investapi.Logger {
-	return global_logger
-}
-
-func DefaultConfig(token string) investapi.Config {
-	return investapi.Config{
-		Token:    token,
-		EndPoint: "sandbox-invest-public-api.tinkoff.ru:443",
-	}
-}
 
 func GetInvestmentPositions(ctx context.Context, req *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
 	// Проверяем, что backend правильного типа
@@ -54,8 +19,8 @@ func GetInvestmentPositions(ctx context.Context, req *pb.GetInvestmentPositionsR
 	}
 
 	// Создаем клиент Tinkoff Invest API
-	cfg := DefaultConfig(req.Backend.Token)
-	_, err := investapi.NewClient(ctx, cfg, global_logger)
+	cfg := utils.DefaultConfig(req.Backend.Token)
+	_, err := investapi.NewClient(ctx, cfg, utils.GetGlobalLogger())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create invest client: %w", err)
 	}

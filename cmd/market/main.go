@@ -6,12 +6,12 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	cm "market-wallet/internal/generated/api-common"
+	//cm "market-wallet/internal/generated/api-common"
 	pb "market-wallet/internal/generated/api-market"
 
 	// for created_at
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
+	//"google.golang.org/protobuf/types/known/timestamppb"
+	//"time"
 
 	market "market-wallet/internal/market"
 )
@@ -51,33 +51,15 @@ func (s *server) GetSecuritiesPrices(c context.Context, req *pb.GetSecuritiesPri
 // Мок для получения выплат по бумагам
 // in [figi]+, start_date, stop_date
 // out [(figi,payment, payment_date), ...]+
-func (s *server) GetSecurityPayments(_ context.Context, req *pb.GetSecuritiesPaymentsRequest) (*pb.GetSecuritiesPaymentsResponse, error) {
+func (s *server) GetSecurityPayments(c context.Context, req *pb.GetSecuritiesPaymentsRequest) (*pb.GetSecuritiesPaymentsResponse, error) {
 	log.Printf("Received: GetSecurityPayments")
-	figis := req.GetFigis() // []string
-	start_date := req.GetStartDate()
-	end_date := req.GetEndDate()
-	log.Printf("Received: GetSecurityPayments %v, %v, %v", figis, start_date, end_date)
 
-	ret := []*pb.SecurityPayment{
-		&pb.SecurityPayment{
-			Figi: "figi1",
-			Payment: &cm.Money{
-				Amount:   34500, // копеек
-				Currency: "RUR",
-			},
-			PaymentDate: timestamppb.New(time.Now()), // bruh
-		},
-		&pb.SecurityPayment{
-			Figi: "figi2",
-			Payment: &cm.Money{
-				Amount:   100, // копеек
-				Currency: "RUR",
-			},
-			PaymentDate: timestamppb.New(time.Now()), // bruh^2
-		},
+	future_payments, err := market.GetFuturePayments(c, req.GetFigis(), req.GetStartDate(), req.GetEndDate())
+	if err != nil {
+		return nil, err
 	}
 
-	return &pb.GetSecuritiesPaymentsResponse{Payments: ret}, nil
+	return &pb.GetSecuritiesPaymentsResponse{Payments: future_payments}, nil
 }
 
 func main() {
