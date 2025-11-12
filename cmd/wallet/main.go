@@ -48,9 +48,41 @@ func (s *server) GetAccounts(_ context.Context, req *pb.GetAccountsRequest) (*pb
     return &pb.GetAccountsResponse{Accounts: accounts}, nil
 }
 
-func (s *server) GetTransactions(context.Context, *pb.GetTransactionsRequest) (*pb.GetTransactionsResponse, error) {
-    
-    return nil, nil
+// мок для получения транзакций
+// in (usrt_id, [backends]+, start_date, stop_date)
+// out [transactions]+
+func (s *server) GetTransactions(_ context.Context, req *pb.GetTransactionsRequest) (*pb.GetTransactionsResponse, error) {
+    transactions := []*pb.Transaction{
+        &pb.Transaction{
+            AccountId: "хз че тут должно быть",
+            UserId: req.GetUserId(),
+            Type: cm.TransactionType_TRANSACTION_TYPE_EXPENSE,
+            Amount: &cm.Money {
+                Amount: 50,
+                Currency: "RUR",
+            },
+            Category: "eda",
+            FromAccountId: "??",
+            ToAccountId: "??",
+            Date: timestamppb.New(time.Now()),
+            Description: "Заказал питсу",
+        },
+        &pb.Transaction{
+            AccountId: "хз че тут должно быть",
+            UserId: req.GetUserId(),
+            Type: cm.TransactionType_TRANSACTION_TYPE_EXPENSE,
+            Amount: &cm.Money {
+                Amount: 99999,
+                Currency: "RUR",
+            },
+            Category: "it",
+            FromAccountId: "??",
+            ToAccountId: "??",
+            Date: timestamppb.New(time.Now()),
+            Description: "Арендовал сервак для хакатона",
+        },
+    }
+    return &pb.GetTransactionsResponse{Transactions: transactions}, nil
 }
 
 
