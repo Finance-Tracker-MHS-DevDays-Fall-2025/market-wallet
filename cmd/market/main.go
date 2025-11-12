@@ -106,6 +106,39 @@ func (s *server) GetSecuritiesPrices( _ context.Context, req *pb.GetSecuritiesPr
     return ret, nil
 }
 
+
+// Мок для получения выплат по бумагам
+// in [figi]+, start_date, stop_date
+// out [(figi,payment, payment_date), ...]+
+func (s *server) GetSecurityPayments(_ context.Context, req *pb.GetSecuritiesPaymentsRequest) (*pb.GetSecuritiesPaymentsResponse, error) {
+    log.Printf("Received: GetSecurityPayments")
+    figis := req.GetFigis() // []string
+    start_date := req.GetStartDate()
+    end_date := req.GetEndDate()
+    log.Printf("Received: GetSecurityPayments %v, %v, %v", figis, start_date, end_date)
+
+    ret := []*pb.SecurityPayment {
+        &pb.SecurityPayment{
+            Figi: "figi1",
+            Payment: &cm.Money {
+                Amount: 34500, // копеек
+                Currency: "RUR",
+            },
+            PaymentDate: timestamppb.New(time.Now()), // bruh
+        },
+        &pb.SecurityPayment{
+            Figi: "figi2",
+            Payment: &cm.Money {
+                Amount: 100, // копеек
+                Currency: "RUR",
+            },
+            PaymentDate: timestamppb.New(time.Now()), // bruh^2
+        },
+    }
+
+    return &pb.GetSecuritiesPaymentsResponse{Payments: ret}, nil
+}
+
 func main() {
     lis, err := net.Listen("tcp", ":8888")
     if err != nil {
