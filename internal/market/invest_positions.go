@@ -14,7 +14,7 @@ import (
 
 func GetInvestmentPositions(ctx context.Context, req *m_pb.GetInvestmentPositionsRequest) (*m_pb.GetInvestmentPositionsResponse, error) {
 	// Проверяем, что backend правильного типа
-	if req.Backend == nil || req.Backend.Type != "TInvest" {
+	if req.Backend == nil || req.Backend.GetType() != "TInvest" {
 		return nil, errors.New("invalid backend type")
 	}
 
@@ -25,10 +25,16 @@ func GetInvestmentPositions(ctx context.Context, req *m_pb.GetInvestmentPosition
 		return nil, fmt.Errorf("failed to create invest client: %w", err)
 	}
 
+	usersClient := client.NewUsersServiceClient()
+	accounts, err := usersClient.GetAccounts(nil) // получаем все счета
+
+	accountID := ""
+	for _, v := range accounts.GetAccounts() {
+		accountID = v.GetId()
+	}
+
 	// Получаем сервис операций
 	operationsService := client.NewOperationsServiceClient()
-
-	accountID := "123"
 
 	// Получаем позиции по счету
 	positionsResp, err := operationsService.GetPositions(accountID)
@@ -42,29 +48,32 @@ func GetInvestmentPositions(ctx context.Context, req *m_pb.GetInvestmentPosition
 	// Создаем слайс для хранения информации о позициях
 	positions := make([]*m_pb.InvestmentPosition, 0, len(securities))
 
-	// Получаем сервис инструментов для получения дополнительной информации
-	instrumentsService := client.NewInstrumentsServiceClient()
-
+	figis := make([]string, 0, len(securities))
 	for _, security := range securities {
-		// Получаем информацию об инструменте по его uid
-		instrumentResp, err := instrumentsService.InstrumentByUid(security.GetInstrumentUid())
 		if err != nil {
 			return nil, err
 		}
 
-		instrument := instrumentResp.GetInstrument()
-
 		// Создаем позицию
 		position := &m_pb.InvestmentPosition{
-			Figi:     instrument.GetFigi(),
+			Figi:     security.GetFigi(),
 			Quantity: int32(security.GetBalance()),
 			Price: &cm.Money{
-				Amount:   1,
+				Amount:   0,
 				Currency: "RUR",
 			},
 		}
 
+		figis = append(figis, security.GetFigi())
 		positions = append(positions, position)
+	}
+
+	infos, err := getInstrumentsInfoImpl(client, figis)
+	if err != nil {
+		return nil, err
+	}
+	for i, v := range infos {
+		positions[i].Price.Amount = v.Price
 	}
 
 	// Формируем ответ

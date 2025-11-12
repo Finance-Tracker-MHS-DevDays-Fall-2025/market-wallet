@@ -15,6 +15,13 @@ type server struct {
 
 // Мок для получения инфы о количестве бумаг у конкретного пользователя
 // in (user_id, backend, account_id)
+/*
+    message AccountBackend {
+  string type = 1;
+  string account_id = 2;
+  string token = 3;
+}
+*/
 func (s *server) GetInvestmentPositions(c context.Context, req *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
 	return market.GetInvestmentPositions(c, req)
 }

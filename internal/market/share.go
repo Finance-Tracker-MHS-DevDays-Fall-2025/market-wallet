@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/russianinvestments/invest-api-go-sdk/investgo"
+	pb "github.com/russianinvestments/invest-api-go-sdk/proto"
 
 	cm "market-wallet/internal/generated/api-common"
 	m_pb "market-wallet/internal/generated/api-market"
@@ -99,7 +100,12 @@ func getInstrumentsInfoImpl(client *investgo.Client, figis []string) ([]instrume
 
 			// Сохраняем цену
 			lastPrice := lastPriceResp.GetLastPrices()[0]
-			info.Price = utils.QToRUR(lastPrice.GetPrice(), int64(resp.GetInstrument().GetLot()))
+
+			if resp.GetInstrument().GetInstrumentKind() == pb.InstrumentType_INSTRUMENT_TYPE_SHARE {
+				info.Price = utils.QToRUR(lastPrice.GetPrice(), int64(resp.GetInstrument().GetLot()))
+			} else {
+				info.Price = 0
+			}
 			info.Time = lastPrice.GetTime()
 			results[index] = info
 		}(i, figi)

@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"log"
-	"os"
+	//"os"
 	"time"
 
 	"google.golang.org/grpc"
+	cm "market-wallet/internal/generated/api-common"
 	pb "market-wallet/internal/generated/api-market"
+	//"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -46,7 +48,12 @@ func main() {
 	defer cancel()
 
 	// запрс на получение пользователя
-	r, err := c.GetSecurity(ctx, &pb.GetSecurityRequest{Figi: os.Args[1]})
+	/*
+		    start := timestamppb.New(time.Now().AddDate(0, -6, 0))
+			stop := timestamppb.New(time.Now().AddDate(0, 6, 0)) // +6 месяцев
+			r, err := c.GetSecurityPayments(ctx, &pb.GetSecuritiesPaymentsRequest{Figis: []string{os.Args[1]}, StartDate: start, EndDate: stop})
+	*/
+	r, err := c.GetInvestmentPositions(ctx, &pb.GetInvestmentPositionsRequest{UserId: "uid", Backend: &cm.AccountBackend{Type: "TInvest", AccountId: "aid", Token: "tok"}, AccountId: "aid"})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}

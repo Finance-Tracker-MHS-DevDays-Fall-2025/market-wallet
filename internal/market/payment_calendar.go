@@ -93,7 +93,6 @@ func getFuturePayments(
 			if err != nil {
 				return nil, err
 			}
-
 			for _, coupon := range couponsResp.GetEvents() {
 				payments = append(payments, PaymentInfo{
 					FIGI:   figi,
