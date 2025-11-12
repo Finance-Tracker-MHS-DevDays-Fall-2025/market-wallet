@@ -314,7 +314,7 @@ const file_common_common_proto_rawDesc = "" +
 	"\x17TIME_PERIOD_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11TIME_PERIOD_MONTH\x10\x01\x12\x17\n" +
 	"\x13TIME_PERIOD_QUARTER\x10\x02\x12\x14\n" +
-	"\x10TIME_PERIOD_YEAR\x10\x03B\x0eZ\f./api-commonb\x06proto3"
+	"\x10TIME_PERIOD_YEAR\x10\x03B-Z+market-wallet/internal/generated/api-commonb\x06proto3"
 
 var (
 	file_common_common_proto_rawDescOnce sync.Once

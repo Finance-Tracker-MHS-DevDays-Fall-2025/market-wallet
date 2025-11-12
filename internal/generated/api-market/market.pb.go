@@ -7,10 +7,10 @@
 package api_market
 
 import (
-	api_common "market-wallet/internal/generated/api-common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	api_common "market-wallet/internal/generated/api-common"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
