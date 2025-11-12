@@ -13,11 +13,11 @@ import (
 )
 
 func ToRUR(amount *pb.MoneyValue) int64 {
-	return int64(amount.Units*10) + int64(amount.Nano/1e7)
+	return int64(amount.Units*100) + int64(amount.Nano/1e7)
 }
 
 func QToRUR(q *pb.Quotation, lot int64) int64 {
-	return (int64(q.Units*10) + int64(q.Nano/1e7)) * lot
+	return (int64(q.Units*100) + int64(q.Nano/1e7)) * lot
 }
 
 func GetDefaultLogger() investapi.Logger {
