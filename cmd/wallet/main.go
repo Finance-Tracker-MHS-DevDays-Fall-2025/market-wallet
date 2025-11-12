@@ -84,7 +84,7 @@ func (s *server) GetTransactions(_ context.Context, req *pb.GetTransactionsReque
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":9999")
+	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

@@ -81,13 +81,13 @@ func (s *server) GetSecurityPayments(_ context.Context, req *pb.GetSecuritiesPay
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":8888")
+	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	pb.RegisterMarketServiceServer(s, &server{})
-	log.Printf("Server listening at %v", lis.Addr())
+	log.Printf("MarketServiceServe listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
