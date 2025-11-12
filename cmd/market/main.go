@@ -12,6 +12,8 @@ import (
     // for created_at
     "google.golang.org/protobuf/types/known/timestamppb"
     "time"
+
+    market "market-wallet/internal/market"
 )
 
 /*
@@ -30,7 +32,9 @@ type server struct {
 
 // Мок для получения инфы о количестве бумаг у конкретного пользователя
 // in (user_id, backend, account_id)
-func (s *server) GetInvestmentPositions(context.Context, *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
+func (s *server) GetInvestmentPositions(c context.Context, req *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
+    return market.GetInvestmentPositions(c, req)
+/*
     log.Printf("Received: GetInvestmentPositions")
     positions := []*pb.InvestmentPosition{
         &pb.InvestmentPosition {
@@ -52,58 +56,30 @@ func (s *server) GetInvestmentPositions(context.Context, *pb.GetInvestmentPositi
     }
     ret := &pb.GetInvestmentPositionsResponse{Positions: positions};
     return ret, nil
+*/
 }
 
 // Мок для получения информации о бумаге/облигации
 // in figi
 // out (id, figi, pretty_name, current_price, price_updated_at)
-func (s *server) GetSecurity(_ context.Context, req *pb.GetSecurityRequest) (*pb.GetSecurityResponse, error) {
-    log.Printf("Received: GetSecurity")
-    sec := &pb.Security{
-        Id: "хз что тут должно быть",
-        Figi: req.GetFigi(),
-        Name: "Полное имя бумаги",
-        CurrentPrice: &cm.Money {
-            Amount: 90000, // копеек
-            Currency: "RUR",
-        },
-        PriceUpdatedAt: timestamppb.New(time.Now()),
+func (s *server) GetSecurity(c context.Context, req *pb.GetSecurityRequest) (*pb.GetSecurityResponse, error) {
+    infos, err := market.GetInstrumentsInfo(c, []string{req.GetFigi()});
+    if err != nil {
+        return nil, err
     }
-    ret := &pb.GetSecurityResponse{Security: sec};
-    return ret, nil
+    return &pb.GetSecurityResponse{Security: infos[0]}, nil
 }
 
 
 // Мок для получения информации о бумаге/облигации (теперь получаем массив
 // in [figi]+
 // out [(id, figi, pretty_name, current_price, price_updated_at)]+
-func (s *server) GetSecuritiesPrices( _ context.Context, req *pb.GetSecuritiesPricesRequest) (*pb.GetSecuritiesPricesResponse, error) {
-    figis := req.GetFigis() // []string
-    log.Printf("Received: GetSecuritiesPrices")
-    secs := []*pb.Security{
-        &pb.Security{
-            Id: "хз что тут должно быть",
-            Figi: figis[0],
-            Name: "Полное имя бумаги",
-            CurrentPrice: &cm.Money {
-                Amount: 90000, // копеек
-                Currency: "RUR",
-            },
-            PriceUpdatedAt: timestamppb.New(time.Now()),
-        },
-        &pb.Security{
-            Id: "хз что тут должно быть 2",
-            Figi: figis[1],
-            Name: "Полное имя бумаги 2",
-            CurrentPrice: &cm.Money {
-                Amount: 34500, // копеек
-                Currency: "RUR",
-            },
-            PriceUpdatedAt: timestamppb.New(time.Now()),
-        },
+func (s *server) GetSecuritiesPrices(c context.Context, req *pb.GetSecuritiesPricesRequest) (*pb.GetSecuritiesPricesResponse, error) {
+    infos, err := market.GetInstrumentsInfo(c, req.GetFigis());
+    if err != nil {
+        return nil, err
     }
-    ret := &pb.GetSecuritiesPricesResponse{Securities: secs};
-    return ret, nil
+    return &pb.GetSecuritiesPricesResponse{Securities: infos}, nil
 }
 
 
