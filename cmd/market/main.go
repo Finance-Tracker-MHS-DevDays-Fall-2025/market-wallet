@@ -16,16 +16,6 @@ import (
 	market "market-wallet/internal/market"
 )
 
-/*
-type MarketServiceServer interface {
-    GetInvestmentPositions(context.Context, *GetInvestmentPositionsRequest) (*GetInvestmentPositionsResponse, error)
-    GetSecurity(context.Context, *GetSecurityRequest) (*GetSecurityResponse, error)
-    GetSecuritiesPrices(context.Context, *GetSecuritiesPricesRequest) (*GetSecuritiesPricesResponse, error)
-    GetSecurityPayments(context.Context, *GetSecuritiesPaymentsRequest) (*GetSecuritiesPaymentsResponse, error)
-    mustEmbedUnimplementedMarketServiceServer()
-}
-*/
-
 type server struct {
 	pb.UnimplementedMarketServiceServer
 }
@@ -34,31 +24,6 @@ type server struct {
 // in (user_id, backend, account_id)
 func (s *server) GetInvestmentPositions(c context.Context, req *pb.GetInvestmentPositionsRequest) (*pb.GetInvestmentPositionsResponse, error) {
 	return market.GetInvestmentPositions(c, req)
-	/*
-	   log.Printf("Received: GetInvestmentPositions")
-
-	   	positions := []*pb.InvestmentPosition{
-	   	    &pb.InvestmentPosition {
-	   	        Figi: "figi1",
-	   	        Quantity: 15,
-	   	        Price: &cm.Money {
-	   	            Amount: 100000, // копеек
-	   	            Currency: "RUR",
-	   	        },
-	   	    },
-	   	    &pb.InvestmentPosition{
-	   	        Figi: "figi2",
-	   	        Quantity: 1,
-	   	        Price: &cm.Money {
-	   	            Amount: 130000, // копеек
-	   	            Currency: "RUR",
-	   	        },
-	   	    },
-	   	}
-
-	   ret := &pb.GetInvestmentPositionsResponse{Positions: positions};
-	   return ret, nil
-	*/
 }
 
 // Мок для получения информации о бумаге/облигации
