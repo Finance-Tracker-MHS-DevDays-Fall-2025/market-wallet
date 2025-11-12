@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"os"
 	"time"
 
 	investapi "github.com/russianinvestments/invest-api-go-sdk/investgo"
@@ -13,6 +14,10 @@ import (
 
 func ToRUR(amount *pb.MoneyValue) int64 {
 	return int64(amount.Units*10) + int64(amount.Nano/1e7)
+}
+
+func QToRUR(q *pb.Quotation, lot int64) int64 {
+	return (int64(q.Units*10) + int64(q.Nano/1e7)) * lot
 }
 
 func GetDefaultLogger() investapi.Logger {
@@ -42,7 +47,8 @@ func GetGlobalLogger() investapi.Logger {
 
 func DefaultConfig(token string) investapi.Config {
 	return investapi.Config{
-		Token:    token,
-		EndPoint: "sandbox-invest-public-api.tinkoff.ru:443",
+		Token:    os.Getenv("TOKEN"),
+		EndPoint: "invest-public-api.tinkoff.ru:443",
+		AppName:  "invest-api-go-sdk",
 	}
 }

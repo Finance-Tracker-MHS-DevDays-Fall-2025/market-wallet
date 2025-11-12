@@ -23,6 +23,7 @@ func (s *server) GetInvestmentPositions(c context.Context, req *pb.GetInvestment
 // in figi
 // out (id, figi, pretty_name, current_price, price_updated_at)
 func (s *server) GetSecurity(c context.Context, req *pb.GetSecurityRequest) (*pb.GetSecurityResponse, error) {
+	log.Printf("GetSecurity, figi: %s", req.GetFigi())
 	infos, err := market.GetInstrumentsInfo(c, []string{req.GetFigi()})
 	if err != nil {
 		return nil, err

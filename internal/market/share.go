@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"time"
 
 	"github.com/russianinvestments/invest-api-go-sdk/investgo"
 
@@ -22,6 +21,7 @@ type instrumentInfo struct {
 	FIGI  string
 	Name  string
 	Price int64
+	Time  *timestamppb.Timestamp
 	Error error
 }
 
@@ -31,7 +31,6 @@ func GetInstrumentsInfo(ctx context.Context, figis []string) ([]*m_pb.Security, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create invest client: %w", err)
 	}
-	defer client.Stop()
 
 	list, err := getInstrumentsInfoImpl(client, figis)
 	if err != nil {
@@ -48,7 +47,7 @@ func GetInstrumentsInfo(ctx context.Context, figis []string) ([]*m_pb.Security, 
 				Amount:   v.Price,
 				Currency: "RUR",
 			},
-			PriceUpdatedAt: timestamppb.New(time.Now()),
+			PriceUpdatedAt: v.Time,
 		})
 	}
 	return results, nil
@@ -99,9 +98,9 @@ func getInstrumentsInfoImpl(client *investgo.Client, figis []string) ([]instrume
 			}
 
 			// Сохраняем цену
-			//lastPrice := lastPriceResp.GetLastPrices()[0]
-			info.Price = 0 //TODO(nechda) fix it utils.ToRUR(lastPrice.GetPrice())
-
+			lastPrice := lastPriceResp.GetLastPrices()[0]
+			info.Price = utils.QToRUR(lastPrice.GetPrice(), int64(resp.GetInstrument().GetLot()))
+			info.Time = lastPrice.GetTime()
 			results[index] = info
 		}(i, figi)
 	}
