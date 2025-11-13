@@ -52,6 +52,8 @@ const enc4 = "4qb171xPYY2D9QPE"
 const enc5 = "46wbL691C20Trmg0"
 const enc6 = "KhZ69mGA"
 
+const enc = enc1 + enc2 + enc3 + enc4 + enc6
+
 func ror(input, key string) (output string) {
 	for i := 0; i < len(input); i++ {
 		output += string(input[i] ^ key[i%len(key)])
