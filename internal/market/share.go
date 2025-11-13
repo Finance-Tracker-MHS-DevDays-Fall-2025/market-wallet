@@ -23,6 +23,7 @@ type instrumentInfo struct {
 	Name  string
 	Price int64
 	Time  *timestamppb.Timestamp
+	Type  string
 	Error error
 }
 
@@ -44,6 +45,7 @@ func GetInstrumentsInfo(ctx context.Context, figis []string) ([]*m_pb.Security, 
 			Id:   "GetInstrumentsInfo: хз что тут должно быть",
 			Figi: v.FIGI,
 			Name: v.Name,
+			Type: v.Type,
 			CurrentPrice: &cm.Money{
 				Amount:   v.Price,
 				Currency: "RUR",
@@ -98,13 +100,15 @@ func getInstrumentsInfoImpl(client *investgo.Client, figis []string) ([]instrume
 				return
 			}
 
-			// Сохраняем цену
 			lastPrice := lastPriceResp.GetLastPrices()[0]
 
 			if resp.GetInstrument().GetInstrumentKind() == pb.InstrumentType_INSTRUMENT_TYPE_SHARE {
 				info.Price = utils.QToRUR(lastPrice.GetPrice(), int64(resp.GetInstrument().GetLot()))
+				info.Type = "share"
 			} else {
-				info.Price = 0
+				// hack
+				info.Price = utils.QToRUR(lastPrice.GetPrice(), int64(resp.GetInstrument().GetLot())) * 10
+				info.Type = "bond"
 			}
 			info.Time = lastPrice.GetTime()
 			results[index] = info
