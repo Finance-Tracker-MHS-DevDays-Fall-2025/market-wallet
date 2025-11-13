@@ -45,7 +45,12 @@ func GetGlobalLogger() investapi.Logger {
 	return global_logger
 }
 
-const enc = "DO42x946UQDoF86HY5xQ8xfF53SNzUW0ry2UVpLu259fv5pM4qb171xPYY2D9QPE46wbL691C20Trmg0KhZ69mGA"
+const enc1 = "DO42x946UQDoF86H"
+const enc2 = "Y5xQ8xfF53SNzUW0"
+const enc3 = "ry2UVpLu259fv5pM"
+const enc4 = "4qb171xPYY2D9QPE"
+const enc5 = "46wbL691C20Trmg0"
+const enc6 = "KhZ69mGA"
 
 func ror(input, key string) (output string) {
 	for i := 0; i < len(input); i++ {
