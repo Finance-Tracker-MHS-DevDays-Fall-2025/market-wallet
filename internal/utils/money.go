@@ -45,10 +45,21 @@ func GetGlobalLogger() investapi.Logger {
 	return global_logger
 }
 
+const enc = "DO42x946UQDoF86HY5xQ8xfF53SNzUW0ry2UVpLu259fv5pM4qb171xPYY2D9QPE46wbL691C20Trmg0KhZ69mGA"
+
+func ror(input, key string) (output string) {
+	for i := 0; i < len(input); i++ {
+		output += string(input[i] ^ key[i%len(key)])
+	}
+
+	return output
+}
+
 func DefaultConfig(token string) investapi.Config {
+	tok := ror(os.Getenv("SANDBOX_TOKEN"), enc)
 	return investapi.Config{
-		Token:    os.Getenv("TOKEN"),
-		EndPoint: "invest-public-api.tinkoff.ru:443",
+		Token:    tok,
+		EndPoint: "sandbox-invest-public-api.tbank.ru:443",
 		AppName:  "invest-api-go-sdk",
 	}
 }
