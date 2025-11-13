@@ -42,7 +42,7 @@ func GetInstrumentsInfo(ctx context.Context, figis []string) ([]*m_pb.Security, 
 	results := make([]*m_pb.Security, 0, len(figis))
 	for _, v := range list {
 		results = append(results, &m_pb.Security{
-			Id:   "GetInstrumentsInfo: хз что тут должно быть",
+			Id:   "id",
 			Figi: v.FIGI,
 			Name: v.Name,
 			Type: v.Type,
