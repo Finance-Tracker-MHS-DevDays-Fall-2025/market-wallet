@@ -58,8 +58,9 @@ func ror(input, key string) (output string) {
 func DefaultConfig(token string) investapi.Config {
 	tok := ror(os.Getenv("SANDBOX_TOKEN"), enc)
 	return investapi.Config{
-		Token:    tok,
-		EndPoint: "sandbox-invest-public-api.tbank.ru:443",
-		AppName:  "invest-api-go-sdk",
+		Token:              tok,
+		EndPoint:           "sandbox-invest-public-api.tbank.ru:443",
+		AppName:            "invest-api-go-sdk",
+		InsecureSkipVerify: true,
 	}
 }
